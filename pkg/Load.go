@@ -19,6 +19,12 @@ type dbLoad struct {
 	DBPrefix   string
 }
 
+type wechatLoad struct {
+	Token     string
+	AppID     string
+	AppSecret string
+}
+
 type load struct {
 	Cfg          *ini.File
 	RunMode      string
@@ -28,7 +34,8 @@ type load struct {
 	PageSize     int
 	JwtSecret    string
 
-	DB dbLoad
+	DB     dbLoad
+	Wechat wechatLoad
 }
 
 var LoadData = &load{}
@@ -81,4 +88,14 @@ func (this *load) loadDB() {
 	this.DB.DBUser = sec.Key("DBUser").String()
 	this.DB.DBPassword = sec.Key("DBPassword").String()
 	this.DB.DBPrefix = sec.Key("DBPrefix").String()
+}
+
+func (this *load) loadWechat() {
+	sec, err := this.Cfg.GetSection("wechat")
+	if err != nil {
+		log.Fatalf("Fail to get section 'wechat': %v", err)
+	}
+	this.Wechat.Token = sec.Key("Token").String()
+	this.Wechat.AppID = sec.Key("AppID").String()
+	this.Wechat.AppSecret = sec.Key("AppSecret").String()
 }

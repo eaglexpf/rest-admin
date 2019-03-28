@@ -31,18 +31,20 @@ func (this *CommonController) RegisterRouter(router *gin.Engine) {
 }
 
 var wechatServer = wechat.Server{
-	Token:     "***",
-	AppID:     "***",
-	AppSecert: "***",
+	Token:     pkg.LoadData.Wechat.Token,
+	AppID:     pkg.LoadData.Wechat.AppID,
+	AppSecert: pkg.LoadData.Wechat.AppSecret,
 }
 
 func (this *CommonController) instance(c *gin.Context) {
-	wechatServer.CheckSign(c)
+	if !wechatServer.CheckSign(c) {
+		return
+	}
 	c.String(http.StatusOK, "%s", "success")
 	var msg wechat.XmlData
 	err := c.Bind(&msg)
 	if err != nil {
-		fmt.Println(err.Error())
+		c.String(http.StatusOK, "%s", err.Error())
 		return
 	}
 	switch msg.MsgType {
