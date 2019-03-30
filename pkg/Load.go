@@ -50,6 +50,7 @@ func init() {
 	LoadData.loadBase()
 	LoadData.loadServe()
 	LoadData.loadDB()
+	LoadData.loadWechat()
 }
 
 func (this *load) loadBase() {

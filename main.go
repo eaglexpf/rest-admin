@@ -11,8 +11,10 @@ import (
 )
 
 func registerRouter(router *gin.Engine) {
+	router.Use(pkg.Cors())
 	new(controllers.HelloController).RegisterRouter(router)
 	new(controllers.CommonController).RegisterRouter(router)
+	router.Static("/view", "./view")
 }
 
 func main() {
