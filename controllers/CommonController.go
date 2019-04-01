@@ -7,6 +7,8 @@ import (
 
 	"time"
 
+	"strconv"
+
 	c_wechat "github.com/eaglexpf/rest-admin/controllers/wechat"
 	"github.com/eaglexpf/rest-admin/pkg"
 	"github.com/eaglexpf/rest-admin/pkg/wechat"
@@ -31,6 +33,7 @@ func (this *CommonController) RegisterRouter(router *gin.Engine) {
 	r.POST("/upload_prize", this.UploadPrize)
 	r.GET("/advert", this.getAdvert)
 	r.GET("/prize", this.getPrize)
+	r.POST("/create_prize", this.createPrize)
 }
 
 var wechatServer = wechat.Server{
@@ -454,5 +457,54 @@ func (this *CommonController) getPrize(c *gin.Context) {
 		"code": 1,
 		"msg":  "success",
 		"data": data,
+	})
+}
+
+//创建广告图
+func (this *CommonController) createAdvert(c *gin.Context) {
+
+}
+
+/**
+ * @api {get} /wechat/create_prize 创建优惠券
+ * @apiDescription 创建优惠券
+ * @apiGroup AUTH
+ * @apiVersion 0.1.0
+ *
+ * @apiParam {string} name 优惠券名称
+ * @apiParam {string} unit 优惠券单位
+ * @apiParam {string} img_url 优惠券地址
+ * @apiParam {string} icon_on 优惠券激活地址
+ * @apiParam {string} icon_off 优惠券关闭地址
+ * @apiParam {int} num 优惠券数量
+ * @apiParam {int} valid_start 优惠券开始时间
+ * @apiParam {int} valid_end 优惠券结束时间
+ *
+ * @apiSuccess {int} code 状态值
+ * @apiSuccess {string} msg 状态描述
+ * @apiSuccess {object} data 返回数据
+ *
+ **/
+//创建优惠券
+func (this *CommonController) createPrize(c *gin.Context) {
+	name := c.Query("name")
+	unit := c.Query("unit")
+	img_url := c.Query("img_url")
+	icon_on := c.Query("icon_on")
+	icon_off := c.Query("icon_off")
+	num_c := c.Query("num")
+	valid_start_c := c.Query("valid_start")
+	valid_end_c := c.Query("valid_end")
+	num, _ := strconv.Atoi(num_c)
+	valid_start, _ := strconv.Atoi(valid_start_c)
+	valid_end, _ := strconv.Atoi(valid_end_c)
+
+	var prizeService service.PrizeService
+	err := prizeService.Create(name, unit, img_url, icon_on, icon_off, num, valid_start, valid_end)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  err.Error(),
+		"data": make(map[string]string),
 	})
 }

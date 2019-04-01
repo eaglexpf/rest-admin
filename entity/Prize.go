@@ -10,11 +10,13 @@ type Prize struct {
 	Num             int    `gorm:"Column:num;Type:int(11);NOT NULL;" json:"num"`
 	Type            int    `gorm:"Column:type;Type:int(4);NOT NULL;" json:"type"`
 	Prob            int    `gorm:"Column:prob;Type:int(5);NOT NULL;" json:"prob"`
-	SceneAlias      int    `gorm:"Column:scene_alias;Type:varchar(30);NOT NULL;" json:"-"`
+	ValidStart      int    `gorm:"Column:valid_start;Type:int(11);NOT NULL;" json:"valid_start"`
+	ValidEnd        int    `gorm:"Column:valid_end;Type:int(11);NOT NULL;" json:"valid_end"`
+	SceneAlias      int    `gorm:"Column:scene_alias;Type:varchar(30);NOT NULL;" json:"scene_alias"`
 }
 
 func (Prize) TableName() string {
-	return prefix + "prize"
+	return prefix + "wechat_prize"
 }
 
 func init() {

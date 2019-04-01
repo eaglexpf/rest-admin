@@ -1,7 +1,7 @@
 package service
 
 import (
-	//	"fmt"
+	"fmt"
 
 	"strings"
 
@@ -19,4 +19,20 @@ func (PrizeService) GetList(scenes string) map[string]interface{} {
 		data[value] = item
 	}
 	return data
+}
+
+func (PrizeService) Create(name, unit, img_url, icon_on, icon_off string, num, valid_start, valid_end int) error {
+	var prize = &entity.Prize{
+		Name:            name,
+		Unit:            unit,
+		UnityUrl:        img_url,
+		IconUrlActive:   icon_on,
+		IconUrlInactive: icon_off,
+		Num:             num,
+		ValidStart:      valid_start,
+		ValidEnd:        valid_end,
+	}
+	err := db.Create(prize).Error
+	fmt.Println(prize.ID, prize.Name, prize)
+	return err
 }
