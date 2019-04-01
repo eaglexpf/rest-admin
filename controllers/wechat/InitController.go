@@ -64,15 +64,12 @@ func (this *InitController) Start(msg wechat.XmlData, wechatServer wechat.Server
 	startData := make(map[string]interface{})
 	startData["user_id"] = wechatUser.ID
 	startData["log_id"] = log.ID
-	startData["scene"] = "broadcast"
-	startData["broadcast_time"] = 180
 	startData["timestamp"] = time.Now().Unix()
-	startData["token"] = "87d7b590a440da860adc7069fdc3c2ef"
+	startData["account"] = pkg.LoadData.Wechat.Account
+	startData["token"] = pkg.LoadData.Wechat.ApiToken
 	sign := this.Sign(startData)
 	startData["sign"] = sign
-	startData["mode"] = 1
-	startData["uid"] = "6045CB85C000"
-	res, err := this.HttpPostData("https://wechat.kayunzh.com/mfw/baoshui/Control/startCeshi", startData)
+	res, err := this.HttpPostData("https://wechat.kayunzh.com/mfw/baoshui/Api/start", startData)
 	fmt.Println("asdasdadad", res)
 	if err != nil {
 		wechatServer.SendText(msg.FromUserName, err.Error())

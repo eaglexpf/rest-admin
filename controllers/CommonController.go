@@ -7,9 +7,12 @@ import (
 
 	"time"
 
-	"strconv"
+	// "strconv"
+
+	"errors"
 
 	c_wechat "github.com/eaglexpf/rest-admin/controllers/wechat"
+	"github.com/eaglexpf/rest-admin/entity"
 	"github.com/eaglexpf/rest-admin/pkg"
 	"github.com/eaglexpf/rest-admin/pkg/wechat"
 	"github.com/eaglexpf/rest-admin/service"
@@ -59,7 +62,7 @@ func (this *CommonController) instance(c *gin.Context) {
 
 }
 
-var token = "723f8a8bdb6309da6f26e5ab9d8ea005"
+var token = pkg.LoadData.Wechat.ApiMyToken
 
 /**
  * @apiDefine API 接口：
@@ -285,7 +288,12 @@ func (this *CommonController) UploadPrize(c *gin.Context) {
 		if wechatUser.ID > 0 {
 			var wechatUserPrizeService service.WechatUserPrizeService
 			wechatUserPrizeService.InsertUserPrize(log.UserID, log.ID, prize_ids)
-			wechatServer.SendText(wechatUser.Openid, "已获得一张优惠券:"+prize_ids)
+			prize_data := wechatUserPrizeService.GetPrizeListByIds(prize_ids)
+			var prize_name = ""
+			for _, value := range prize_data {
+				prize_name += value.Name + "--"
+			}
+			wechatServer.SendText(wechatUser.Openid, "已获得一张优惠券:"+prize_name)
 		}
 	}
 
@@ -466,7 +474,7 @@ func (this *CommonController) createAdvert(c *gin.Context) {
 }
 
 /**
- * @api {get} /wechat/create_prize 创建优惠券
+ * @api {post} /wechat/create_prize 创建优惠券
  * @apiDescription 创建优惠券
  * @apiGroup AUTH
  * @apiVersion 0.1.0
@@ -476,6 +484,7 @@ func (this *CommonController) createAdvert(c *gin.Context) {
  * @apiParam {string} img_url 优惠券地址
  * @apiParam {string} icon_on 优惠券激活地址
  * @apiParam {string} icon_off 优惠券关闭地址
+ * @apiParam {string} scene_alias 优惠券场景
  * @apiParam {int} num 优惠券数量
  * @apiParam {int} valid_start 优惠券开始时间
  * @apiParam {int} valid_end 优惠券结束时间
@@ -487,24 +496,64 @@ func (this *CommonController) createAdvert(c *gin.Context) {
  **/
 //创建优惠券
 func (this *CommonController) createPrize(c *gin.Context) {
-	name := c.Query("name")
-	unit := c.Query("unit")
-	img_url := c.Query("img_url")
-	icon_on := c.Query("icon_on")
-	icon_off := c.Query("icon_off")
-	num_c := c.Query("num")
-	valid_start_c := c.Query("valid_start")
-	valid_end_c := c.Query("valid_end")
-	num, _ := strconv.Atoi(num_c)
-	valid_start, _ := strconv.Atoi(valid_start_c)
-	valid_end, _ := strconv.Atoi(valid_end_c)
+	request := entity.Prize{}
+	var err error
+	if err = c.ShouldBind(&request); err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]string),
+		})
+		return
+	}
+	if request.Name == "" {
+		err = errors.New("name不能为空")
+	}
+	if request.Unit == "" {
+		err = errors.New("unit不能为空")
+	}
+	if request.ImgUrl == "" {
+		err = errors.New("img_url不能为空")
+	}
+	if request.IconOn == "" {
+		err = errors.New("icon_on不能为空")
+	}
+	if request.IconOff == "" {
+		err = errors.New("icon_off不能为空")
+	}
+	if request.SceneAlias == "" {
+		err = errors.New("scene_alias不能为空")
+	}
+	if request.Num <= 0 {
+		err = errors.New("num不能为空")
+	}
+	if request.ValidStart <= 0 {
+		err = errors.New("valid_start不能为空")
+	}
+	if request.ValidEnd <= 0 {
+		err = errors.New("valid_end不能为空")
+	}
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 400,
+			"msg":  err.Error(),
+			"data": make(map[string]string),
+		})
+		return
+	}
 
-	var prizeService service.PrizeService
-	err := prizeService.Create(name, unit, img_url, icon_on, icon_off, num, valid_start, valid_end)
-
+	var prizeService = service.PrizeService{}
+	err = prizeService.Create(request.Name, request.Unit, request.ImgUrl, request.IconOn, request.IconOff, request.SceneAlias, request.Num, request.ValidStart, request.ValidEnd)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  err.Error(),
+			"data": make(map[string]string),
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
-		"msg":  err.Error(),
+		"msg":  "success",
 		"data": make(map[string]string),
 	})
 }

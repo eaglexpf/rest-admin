@@ -20,9 +20,12 @@ type dbLoad struct {
 }
 
 type wechatLoad struct {
-	Token     string
-	AppID     string
-	AppSecret string
+	Token      string
+	AppID      string
+	AppSecret  string
+	ApiToken   string
+	Account    string
+	ApiMyToken string
 }
 
 type load struct {
@@ -99,4 +102,7 @@ func (this *load) loadWechat() {
 	this.Wechat.Token = sec.Key("Token").String()
 	this.Wechat.AppID = sec.Key("AppID").String()
 	this.Wechat.AppSecret = sec.Key("AppSecret").String()
+	this.Wechat.ApiToken = sec.Key("ApiToken").String()
+	this.Wechat.Account = sec.Key("Account").String()
+	this.Wechat.ApiMyToken = sec.Key("ApiMyToken").String()
 }

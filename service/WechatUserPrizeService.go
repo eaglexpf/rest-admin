@@ -39,3 +39,18 @@ func (WechatUserPrizeService) InsertUserPrize(user_id, log_id int, prize_ids str
 	}
 	return nil
 }
+
+func (WechatUserPrizeService) GetPrizeListByIds(prize_ids string) []entity.Prize {
+	str := strings.Split(prize_ids, ",")
+	var ids []int
+	for _, value := range str {
+		prize_id, _ := strconv.Atoi(value)
+		if prize_id <= 0 {
+			continue
+		}
+		ids = append(ids, prize_id)
+	}
+	var data = []entity.Prize{}
+	db.Where("id in (?)", ids).Find(&data)
+	return data
+}

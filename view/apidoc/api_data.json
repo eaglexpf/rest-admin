@@ -92,111 +92,6 @@
   },
   {
     "type": "get",
-    "url": "/wechat/create_prize",
-    "title": "创建优惠券",
-    "description": "<p>创建优惠券</p>",
-    "group": "AUTH",
-    "version": "0.1.0",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "name",
-            "description": "<p>优惠券名称</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "unit",
-            "description": "<p>优惠券单位</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "img_url",
-            "description": "<p>优惠券地址</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "icon_on",
-            "description": "<p>优惠券激活地址</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "string",
-            "optional": false,
-            "field": "icon_off",
-            "description": "<p>优惠券关闭地址</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "int",
-            "optional": false,
-            "field": "num",
-            "description": "<p>优惠券数量</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "int",
-            "optional": false,
-            "field": "valid_start",
-            "description": "<p>优惠券开始时间</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "int",
-            "optional": false,
-            "field": "valid_end",
-            "description": "<p>优惠券结束时间</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "int",
-            "optional": false,
-            "field": "code",
-            "description": "<p>状态值</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "string",
-            "optional": false,
-            "field": "msg",
-            "description": "<p>状态描述</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "object",
-            "optional": false,
-            "field": "data",
-            "description": "<p>返回数据</p>"
-          }
-        ]
-      }
-    },
-    "filename": "controllers/CommonController.go",
-    "groupTitle": "被动接口",
-    "name": "GetWechatCreate_prize",
-    "sampleRequest": [
-      {
-        "url": "https://ssl.xupengfei.net/wechat/create_prize"
-      }
-    ]
-  },
-  {
-    "type": "get",
     "url": "/wechat/info",
     "title": "获取基础信息",
     "description": "<p>获取基础信息</p>",
@@ -745,6 +640,118 @@
     "sampleRequest": [
       {
         "url": "https://ssl.xupengfei.net/wechat/upload_prize"
+      }
+    ]
+  },
+  {
+    "type": "post",
+    "url": "/wechat/create_prize",
+    "title": "创建优惠券",
+    "description": "<p>创建优惠券</p>",
+    "group": "AUTH",
+    "version": "0.1.0",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "name",
+            "description": "<p>优惠券名称</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "unit",
+            "description": "<p>优惠券单位</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "img_url",
+            "description": "<p>优惠券地址</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "icon_on",
+            "description": "<p>优惠券激活地址</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "icon_off",
+            "description": "<p>优惠券关闭地址</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "string",
+            "optional": false,
+            "field": "scene_alias",
+            "description": "<p>优惠券场景</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "num",
+            "description": "<p>优惠券数量</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "valid_start",
+            "description": "<p>优惠券开始时间</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "int",
+            "optional": false,
+            "field": "valid_end",
+            "description": "<p>优惠券结束时间</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "int",
+            "optional": false,
+            "field": "code",
+            "description": "<p>状态值</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "string",
+            "optional": false,
+            "field": "msg",
+            "description": "<p>状态描述</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "object",
+            "optional": false,
+            "field": "data",
+            "description": "<p>返回数据</p>"
+          }
+        ]
+      }
+    },
+    "filename": "controllers/CommonController.go",
+    "groupTitle": "被动接口",
+    "name": "PostWechatCreate_prize",
+    "sampleRequest": [
+      {
+        "url": "https://ssl.xupengfei.net/wechat/create_prize"
       }
     ]
   }
