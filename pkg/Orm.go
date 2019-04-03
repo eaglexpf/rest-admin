@@ -23,7 +23,7 @@ func init() {
 		log.Fatalf("数据库连接失败: %v", err)
 	}
 	DB.SingularTable(true)
-	DB.LogMode(true)
+	DB.LogMode(false)
 	DB.DB().SetMaxIdleConns(20)
 	DB.DB().SetMaxOpenConns(1000)
 }

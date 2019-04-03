@@ -35,6 +35,6 @@ func (service *WechatLogService) CreateWechatLog(user_id int, ticket string) err
 		UserID:   user_id,
 		Ticket:   ticket,
 		CreateAt: time.Now().Unix(),
-		EndAt:    time.Now().Unix() + 180,
+		EndAt:    time.Now().Unix() + 30,
 	}).Error
 }

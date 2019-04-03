@@ -11,7 +11,7 @@ type Prize struct {
 	Type       int    `gorm:"Column:type;Type:int(4);NOT NULL;" json:"type" form:"type"`
 	Prob       int    `gorm:"Column:prob;Type:int(5);NOT NULL;" json:"prob" form:"prob"`
 	ValidStart int    `gorm:"Column:valid_start;Type:int(11);NOT NULL;" json:"valid_start" form:"valid_start"`
-	ValidEnd   int    `gorm:"Column:valid_end;Type:int(11);NOT NULL;" json:"valid_end" form:"valid_start"`
+	ValidEnd   int    `gorm:"Column:valid_end;Type:int(11);NOT NULL;" json:"valid_end" form:"valid_end"`
 	SceneAlias string `gorm:"Column:scene_alias;Type:varchar(255);NOT NULL;" json:"scene_alias" form:"scene_alias"`
 }
 

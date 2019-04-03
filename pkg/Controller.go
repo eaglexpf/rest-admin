@@ -5,12 +5,14 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"sort"
+	"strconv"
 )
 
 type Controller struct {
@@ -124,4 +126,19 @@ func (Controller) GetFileModTime(path string) (int64, error) {
 	}
 
 	return fi.ModTime().Unix(), nil
+}
+
+func (Controller) InterfaceToInt(data interface{}) (int, error) {
+	switch data.(type) {
+	case int:
+		return data.(int), nil
+	case string:
+		return strconv.Atoi(data.(string))
+	case int64:
+		return int(data.(int64)), nil
+	case float64:
+		strInt64 := strconv.FormatFloat(data.(float64), 'f', -1, 64)
+		return strconv.Atoi(strInt64)
+	}
+	return 0, errors.New("非int类型")
 }

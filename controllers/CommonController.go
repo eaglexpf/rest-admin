@@ -37,20 +37,23 @@ func (this *CommonController) RegisterRouter(router *gin.Engine) {
 	r.GET("/advert", this.getAdvert)
 	r.GET("/prize", this.getPrize)
 	r.POST("/create_prize", this.createPrize)
+	r.GET("/menu", this.menuClear)
+	r.GET("/menu_add", this.menuCreate)
 }
 
-var wechatServer = wechat.Server{
-	Token:     pkg.LoadData.Wechat.Token,
-	AppID:     pkg.LoadData.Wechat.AppID,
-	AppSecert: pkg.LoadData.Wechat.AppSecret,
-}
+//var wechatServer = wechat.Server{
+//	Token:     pkg.LoadData.Wechat.Token,
+//	AppID:     pkg.LoadData.Wechat.AppID,
+//	AppSecert: pkg.LoadData.Wechat.AppSecret,
+//}
 
 //接入微信公众号
 func (this *CommonController) instance(c *gin.Context) {
-	if !wechatServer.CheckSign(c) {
-		return
-	}
-	c.String(http.StatusOK, "%s", "success")
+	wechatServer := wechat.New(pkg.LoadData.Wechat.AppID, pkg.LoadData.Wechat.AppSecret, pkg.LoadData.Wechat.Token)
+	//	if !wechatServer.CheckSign(c) {
+	//		return
+	//	}
+	//	c.String(http.StatusOK, "%s", "success")
 	var msg wechat.XmlData
 	err := c.Bind(&msg)
 	if err != nil {
@@ -58,11 +61,52 @@ func (this *CommonController) instance(c *gin.Context) {
 		return
 	}
 	var wechatInit = c_wechat.InitController{}
-	wechatInit.InitWechat(msg, wechatServer)
+	wechatInit.InitWechat(msg, wechatServer, c)
 
 }
 
 var token = pkg.LoadData.Wechat.ApiMyToken
+
+func (this *CommonController) menuCreate(c *gin.Context) {
+	wechatServer := wechat.New(pkg.LoadData.Wechat.AppID, pkg.LoadData.Wechat.AppSecret, pkg.LoadData.Wechat.Token)
+
+	err := wechatServer.MenuCreate(map[string]interface{}{
+		"button": []interface{}{
+			map[string]interface{}{
+				"type": "click",
+				"name": "点击测试",
+				"key":  "SayHello",
+			},
+		},
+	})
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
+}
+func (this *CommonController) menuClear(c *gin.Context) {
+	wechatServer := wechat.New(pkg.LoadData.Wechat.AppID, pkg.LoadData.Wechat.AppSecret, pkg.LoadData.Wechat.Token)
+
+	err := wechatServer.MenuClear()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": 500,
+			"msg":  err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
+}
 
 /**
  * @apiDefine API 接口：
@@ -105,6 +149,8 @@ func (this *CommonController) getQrCode(c *gin.Context) {
 	}
 	ticketData := make(map[string]interface{})
 	ticketData["scene_str"] = "1231231231"
+	wechatServer := wechat.New(pkg.LoadData.Wechat.AppID, pkg.LoadData.Wechat.AppSecret, pkg.LoadData.Wechat.Token)
+
 	ticket, err := wechatServer.GetTicket(600, "QR_STR_SCENE", ticketData)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
@@ -293,6 +339,8 @@ func (this *CommonController) UploadPrize(c *gin.Context) {
 			for _, value := range prize_data {
 				prize_name += value.Name + "--"
 			}
+			wechatServer := wechat.New(pkg.LoadData.Wechat.AppID, pkg.LoadData.Wechat.AppSecret, pkg.LoadData.Wechat.Token)
+
 			wechatServer.SendText(wechatUser.Openid, "已获得一张优惠券:"+prize_name)
 		}
 	}
@@ -353,6 +401,8 @@ func (this *CommonController) UploadImg(c *gin.Context) {
 		var wechatUserService service.WechatUserService
 		wechatUser := wechatUserService.ExistWechatUserByID(log.UserID)
 		if wechatUser.ID > 0 {
+			wechatServer := wechat.New(pkg.LoadData.Wechat.AppID, pkg.LoadData.Wechat.AppSecret, pkg.LoadData.Wechat.Token)
+
 			wechatServer.SendText(wechatUser.Openid, "已获得一张图片，<a href='"+img+"'>图片</a>")
 		}
 	}

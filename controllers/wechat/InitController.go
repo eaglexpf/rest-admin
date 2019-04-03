@@ -8,23 +8,28 @@ import (
 	"github.com/eaglexpf/rest-admin/pkg"
 	"github.com/eaglexpf/rest-admin/pkg/wechat"
 	"github.com/eaglexpf/rest-admin/service"
+	"github.com/gin-gonic/gin"
 )
 
 type InitController struct {
 	pkg.Controller
 }
 
-func (this *InitController) InitWechat(msg wechat.XmlData, w wechat.Server) {
+func (this *InitController) InitWechat(msg wechat.XmlData, w wechat.Server, c *gin.Context) {
+	fmt.Println(msg)
 	switch msg.MsgType {
 	case "event":
 		this.Events(msg, w)
 		break
 	}
+	var data = w.ResponseText(msg.FromUserName, "Hello World!")
+	//	c.Writer.
+	c.XML(200, data)
 }
 func (this *InitController) Events(msg wechat.XmlData, w wechat.Server) {
 	//	wechatServer.SendText(msg.FromUserName, "已获得一张图片，<a href='https://www.baidu.com'>图片</a>")
 	switch msg.Event {
-	case "subscribe": //用户关注
+	case "subscribe": //用户关注 //未关注时扫描事件
 		this.Start(msg, w)
 		break
 	case "unsubscribe": //取消关注
@@ -38,6 +43,7 @@ func (this *InitController) Events(msg wechat.XmlData, w wechat.Server) {
 	}
 }
 
+//开始游戏，用户扫描事件
 func (this *InitController) Start(msg wechat.XmlData, wechatServer wechat.Server) {
 	var wechatUserService service.WechatUserService
 	var wechatLogService service.WechatLogService
