@@ -15,6 +15,7 @@ import (
 	"github.com/eaglexpf/rest-admin/entity"
 	"github.com/eaglexpf/rest-admin/pkg"
 	"github.com/eaglexpf/rest-admin/pkg/wechat"
+	"github.com/eaglexpf/rest-admin/pkg/wechat/message"
 	"github.com/eaglexpf/rest-admin/service"
 	"github.com/gin-gonic/gin"
 )
@@ -39,6 +40,25 @@ func (this *CommonController) RegisterRouter(router *gin.Engine) {
 	r.POST("/create_prize", this.createPrize)
 	r.GET("/menu", this.menuClear)
 	r.GET("/menu_add", this.menuCreate)
+	r.GET("/aaa", this.aaa)
+	r.POST("/aaa", this.aaa)
+}
+
+func (this *CommonController) aaa(c *gin.Context) {
+	cfg := &wechat.Config{
+		AppId:     pkg.LoadData.Wechat.AppID,
+		AppSecret: pkg.LoadData.Wechat.AppSecret,
+		Token:     pkg.LoadData.Wechat.Token,
+		Writer:    c.Writer,
+		Request:   c.Request,
+	}
+	wx_obj := wechat.NewWechat(cfg)
+	wx_obj.Context.MessageHandleFunc = func(request message.RequestMessage) interface{} {
+		text := message.NewText(request.FromUserName, request.ToUserName, "Hello World!")
+		//		fmt.Println(text)
+		return text
+	}
+	wx_obj.Context.Serve()
 }
 
 //var wechatServer = wechat.Server{
