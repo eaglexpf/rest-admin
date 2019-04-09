@@ -8,12 +8,8 @@ import (
 )
 
 func Signature(params ...string) string {
+	//数组排序
 	sort.Strings(params)
-	//	h := sha1.New()
-	//	for _, s := range params {
-	//		io.WriteString(h, s)
-	//	}
-	//	return fmt.Sprintf("%x", h.Sum(nil))
 
 	h := sha1.New()
 	//写入要处理的字节。如果是一个字符串，需要使用[]byte(s) 来强制转换成字节数组。

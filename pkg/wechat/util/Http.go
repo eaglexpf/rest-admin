@@ -18,7 +18,7 @@ func JSON(data map[string]interface{}) []byte {
 	return bf.Bytes()
 }
 
-//发起http get请求，返回数据为json，返回json解析出来的数据
+//发起http get请求
 func HttpGet(uri string) ([]byte, error) {
 	req, err := http.Get(uri)
 	if err != nil {
@@ -35,8 +35,8 @@ func HttpGet(uri string) ([]byte, error) {
 	return body, err
 }
 
-//发起http post请求，请求数据为json，返回数据为json，返回json解析出来的数据
-func HttpPostJson(uri string, data map[string]interface{}) (map[string]interface{}, error) {
+//发起http post请求，请求数据为json
+func HttpPostJson(uri string, data map[string]interface{}) ([]byte, error) {
 	msg := JSON(data)
 	request, err := http.NewRequest("POST", uri, bytes.NewBuffer(msg))
 	request.Header.Set("Content-Type", "application/json")
@@ -53,16 +53,11 @@ func HttpPostJson(uri string, data map[string]interface{}) (map[string]interface
 	if err != nil {
 		return nil, fmt.Errorf("http get error : uri=%s , cause : %s", uri, err.Error())
 	}
-	var jsonData map[string]interface{}
-	err = json.Unmarshal(body, &jsonData)
-	if err != nil {
-		return nil, fmt.Errorf("http get error : uri=%s , cause : %s", uri, err.Error())
-	}
-	return jsonData, err
+	return body, err
 }
 
-//发起http post请求，请求数据为x-www-form-urlencoded，返回数据为json，返回json解析出来的数据
-func HttpPostData(uri string, data map[string]interface{}) (map[string]interface{}, error) {
+//发起http post请求，请求数据为x-www-form-urlencoded
+func HttpPostData(uri string, data map[string]interface{}) ([]byte, error) {
 	v := url.Values{}
 	for key, value := range data {
 		v.Add(key, fmt.Sprintf("%v", value))
@@ -86,10 +81,5 @@ func HttpPostData(uri string, data map[string]interface{}) (map[string]interface
 	if err != nil {
 		return nil, fmt.Errorf("http get error : uri=%s , cause : %s", uri, err.Error())
 	}
-	var jsonData map[string]interface{}
-	err = json.Unmarshal(body, &jsonData)
-	if err != nil {
-		return nil, fmt.Errorf("http get error : uri=%s , cause : %s", uri, err.Error())
-	}
-	return jsonData, err
+	return body, err
 }

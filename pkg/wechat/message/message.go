@@ -13,6 +13,7 @@ type CommonMessage struct {
 	MsgType      string   `xml:"MsgType"`
 }
 
+//获取的微信消息结构体
 type RequestMessage struct {
 	CommonMessage
 
@@ -44,16 +45,13 @@ type RequestMessage struct {
 	Ticket   string `xml:"Ticket"`
 }
 
-type ResponseMessage struct {
-	MsgType string
-	MsgData interface{}
-}
-
+//返回的文本消息结构体
 type ResponseTextMessage struct {
 	CommonMessage
 	Content string `xml:"Content"`
 }
 
+//初始化一个自动回复的文本消息
 func NewText(from_user_name, to_user_name, content string) *ResponseTextMessage {
 	text := new(ResponseTextMessage)
 	text.FromUserName = from_user_name
@@ -62,4 +60,21 @@ func NewText(from_user_name, to_user_name, content string) *ResponseTextMessage 
 	text.MsgType = "text"
 	text.Content = content
 	return text
+}
+
+type ResponseImageMessage struct {
+	CommonMessage
+	Image struct {
+		MediaId int `xml:"MediaId"`
+	} `xml:"Image"`
+}
+
+func NewImage(from_user_name, to_user_name string, media_id int) *ResponseImageMessage {
+	image := new(ResponseImageMessage)
+	image.FromUserName = from_user_name
+	image.ToUserName = to_user_name
+	image.CreateTime = time.Now().Unix()
+	image.MsgType = "image"
+	image.Image.MediaId = media_id
+	return image
 }

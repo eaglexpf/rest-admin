@@ -26,6 +26,7 @@ func NewFileCache(path string) *File {
 func (this *File) Get(key string) (access_token string, err error) {
 	file_path := this.Path + key
 	var contents []byte
+	fmt.Println(file_path)
 	contents, err = ioutil.ReadFile(file_path)
 	if err != nil {
 		return
@@ -33,9 +34,10 @@ func (this *File) Get(key string) (access_token string, err error) {
 	var file_response FileAccessToken
 	err = json.Unmarshal(contents, &file_response)
 	if err != nil {
+		fmt.Println(err)
 		return
 	}
-	if file_response.ExpiresIn > 0 && file_response.ExpiresIn < time.Now().Unix() {
+	if file_response.ExpiresIn > 0 && file_response.ExpiresIn > time.Now().Unix() {
 		access_token = file_response.AccessToken
 		return
 	} else {
@@ -44,16 +46,26 @@ func (this *File) Get(key string) (access_token string, err error) {
 	return "", err
 }
 
-func (this *File) Set(key string, val string, timeout time.Duration) error {
+func (this *File) Set(key string, val string, timeout int64) error {
 	file_path := this.Path + key
-	err := ioutil.WriteFile(file_path, []byte(val), 0644)
+	//	var file_response FileAccessToken
+	response := FileAccessToken{
+		AccessToken: val,
+		ExpiresIn:   timeout,
+	}
+	data, err := json.Marshal(response)
+	if err != nil {
+		return err
+	}
+	//	fmt.Println(val.([]byte))
+	err = ioutil.WriteFile(file_path, data, 0644)
 	if err != nil {
 		return fmt.Errorf("accessToken写入文件失败：%v", err.Error())
 	}
 	return nil
 }
 
-func (this *File) IsExit(key string) bool {
+func (this *File) IsExist(key string) bool {
 	return true
 }
 

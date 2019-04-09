@@ -6,7 +6,9 @@ import (
 	//	"sync"
 	//	"time"
 
+	"github.com/eaglexpf/rest-admin/pkg/wechat/cache"
 	"github.com/eaglexpf/rest-admin/pkg/wechat/context"
+	"github.com/eaglexpf/rest-admin/pkg/wechat/message"
 )
 
 type Config struct {
@@ -15,12 +17,13 @@ type Config struct {
 	Token     string
 	Writer    http.ResponseWriter
 	Request   *http.Request
+	Cache     cache.Cache
 }
 
 type Wechat struct {
-	AppId     string
-	AppSecret string
-	Token     string
+	//	AppId     string
+	//	AppSecret string
+	//	Token     string
 
 	Context *context.Context
 }
@@ -32,13 +35,20 @@ func NewWechat(cfg *Config) *Wechat {
 		Token:     cfg.Token,
 		Writer:    cfg.Writer,
 		Request:   cfg.Request,
+		Cache:     cfg.Cache,
 	}
 	return &Wechat{Context: con}
 }
 
-func (this *Wechat) Server() {}
+func (this *Wechat) Server() {
+	this.Context.Serve()
+}
 
-func (this *Wechat) GetAccessToken() (string, error) {
+func (this *Wechat) HandleFunc(f func(message.RequestMessage) interface{}) {
+	this.Context.MessageHandleFunc = f
+}
+
+func (this *Wechat) GetAccessToken() string {
 	return this.Context.GetAccessToken()
 }
 

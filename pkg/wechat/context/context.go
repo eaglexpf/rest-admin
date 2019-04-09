@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"errors"
+	//	"errors"
 
 	"io/ioutil"
 
@@ -33,6 +33,11 @@ type Context struct {
 	MessageHandleFunc func(message.RequestMessage) interface{}
 }
 
+type ResponseCommon struct {
+	ErrCode int64  `json:"errcode"`
+	ErrMsg  string `json:"errmsg"`
+}
+
 func (this *Context) Query(key string) string {
 	value, _ := this.GetQuery(key)
 	return value
@@ -54,24 +59,26 @@ func (this *Context) Validate() bool {
 }
 
 //数据接入
-func (this *Context) Serve() error {
+func (this *Context) Serve() {
 	if this.Validate() == false {
-		return errors.New("请求效验失败")
+		this.Strings("请求效验失败")
+		return
 	}
 	if echo_str, ok := this.GetQuery("echostr"); ok {
 		this.Strings(echo_str)
-		return nil
+		return
 	}
 	msg, err := this.GetMessage()
 	if err != nil {
-		return err
+		this.Strings(err.Error())
+		return
 	}
 	this.RequestMsg = msg
 	fmt.Println(msg)
 	fmt.Println(this.MessageHandleFunc)
 	if this.MessageHandleFunc == nil {
 		this.Strings("success")
-		return nil
+		return
 	}
 	response := this.MessageHandleFunc(msg)
 	if response != nil {
@@ -80,9 +87,9 @@ func (this *Context) Serve() error {
 		this.Strings("success")
 	}
 
-	return nil
 }
 
+//解析微信返回的数据
 func (this *Context) GetMessage() (msg message.RequestMessage, err error) {
 	var body []byte
 	body, err = ioutil.ReadAll(this.Request.Body)

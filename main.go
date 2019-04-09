@@ -14,6 +14,7 @@ func registerRouter(router *gin.Engine) {
 	router.Use(pkg.Cors())
 	new(controllers.HelloController).RegisterRouter(router)
 	new(controllers.CommonController).RegisterRouter(router)
+	new(controllers.WechatController).RegisterRouter(router)
 	router.Static("/view", "./view")
 }
 

@@ -54,8 +54,8 @@ func (this *CommonController) aaa(c *gin.Context) {
 	}
 	wx_obj := wechat.NewWechat(cfg)
 	wx_obj.Context.MessageHandleFunc = func(request message.RequestMessage) interface{} {
-		text := message.NewText(request.FromUserName, request.ToUserName, "Hello World!")
-		//		fmt.Println(text)
+		text := message.NewText(request.ToUserName, request.FromUserName, request.Content)
+		fmt.Println(text)
 		return text
 	}
 	wx_obj.Context.Serve()
