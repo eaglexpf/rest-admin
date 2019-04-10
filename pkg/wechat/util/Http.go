@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 )
@@ -80,6 +81,36 @@ func HttpPostData(uri string, data map[string]interface{}) ([]byte, error) {
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("http get error : uri=%s , cause : %s", uri, err.Error())
+	}
+	return body, err
+}
+
+//上传文件
+func HttpPostFile(uri, filedName, filename string, file_data []byte, post_data map[string]string) ([]byte, error) {
+	bodyBuffer := bytes.NewBufferString("")
+
+	bodyWriter := multipart.NewWriter(bodyBuffer)
+
+	fileWriter, _ := bodyWriter.CreateFormFile(filedName, filename)
+	fileWriter.Write(file_data)
+
+	for key, value := range post_data {
+		_ = bodyWriter.WriteField(key, value)
+	}
+
+	contentType := bodyWriter.FormDataContentType()
+
+	bodyWriter.Close()
+
+	response, _ := http.Post(uri, contentType, bodyBuffer)
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("http post file error : uri=%v , statusCode=%v", uri, response.StatusCode)
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, fmt.Errorf("http post file error : uri=%s , cause : %s", uri, err.Error())
 	}
 	return body, err
 }

@@ -9,7 +9,7 @@ import (
 )
 
 //用户列表结构体
-type ResponseUserOpenidList struct {
+type ResponseUserList struct {
 	ResponseCommon
 
 	Total int64 `json:"total"`
@@ -44,14 +44,14 @@ type ResponseUserInfo struct {
 }
 
 //多个用户信息结构体
-type ResponseUserInfoBatchget struct {
+type ResponseBatchUserInfo struct {
 	ResponseCommon
 
 	UserInfoList []ResponseUserInfo `json:"user_info_list"`
 }
 
 //用户标签列表结构体
-type ResponseUserTagsList struct {
+type ResponseTagsList struct {
 	ResponseCommon
 
 	Tags []struct {
@@ -62,7 +62,7 @@ type ResponseUserTagsList struct {
 }
 
 //创建用户标签返回的数据结构体
-type ResponseCreateUserTags struct {
+type ResponseTagsCreate struct {
 	ResponseCommon
 
 	Tag struct {
@@ -72,7 +72,7 @@ type ResponseCreateUserTags struct {
 }
 
 //标签下的粉丝列表结构体
-type ResponseTagsOpenidList struct {
+type ResponseUserListFromTags struct {
 	ResponseCommon
 
 	Count int64 `json:"count"`
@@ -83,21 +83,33 @@ type ResponseTagsOpenidList struct {
 }
 
 const (
-	UserOpenidListUrl   = "https://api.weixin.qq.com/cgi-bin/user/get"
-	UserInfoUrl         = "https://api.weixin.qq.com/cgi-bin/user/info"
-	UserInfoBatchgetUrl = "https://api.weixin.qq.com/cgi-bin/user/info/batchget"
-
-	UserTagsListUrl   = "https://api.weixin.qq.com/cgi-bin/tags/get"
-	UserTagsCreateUrl = "https://api.weixin.qq.com/cgi-bin/tags/create"
-	UserTagsUpdateUrl = "https://api.weixin.qq.com/cgi-bin/tags/update"
-	UserTagsDeleteUrl = "https://api.weixin.qq.com/cgi-bin/tags/delete"
-
-	TagsOpenidListUrl = "https://api.weixin.qq.com/cgi-bin/user/tag/get"
+	//用户列表[openid]
+	UrlUserList = "https://api.weixin.qq.com/cgi-bin/user/get"
+	//单个用户信息
+	UrlUserInfo = "https://api.weixin.qq.com/cgi-bin/user/info"
+	//批量获取多个用户信息
+	UrlBatchUserInfo = "https://api.weixin.qq.com/cgi-bin/user/info/batchget"
+	//设置用户备注名
+	UrlSetUserRemark = "https://api.weixin.qq.com/cgi-bin/user/info/updateremark"
+	//标签列表
+	UrlTagsList = "https://api.weixin.qq.com/cgi-bin/tags/get"
+	//创建标签
+	UrlTagsCreate = "https://api.weixin.qq.com/cgi-bin/tags/create"
+	//修改标签
+	UrlTagsUpdate = "https://api.weixin.qq.com/cgi-bin/tags/update"
+	//删除标签
+	UrlTagsDelete = "https://api.weixin.qq.com/cgi-bin/tags/delete"
+	//标签下的粉丝列表[openid]
+	UrlUserListFromTags = "https://api.weixin.qq.com/cgi-bin/user/tag/get"
+	//批量为用户打标签
+	UrlBatchTaggingUser = "https://api.weixin.qq.com/cgi-bin/tags/members/batchtagging"
+	//批量为用户取消标签
+	UrlBatchUnTaggingUser = "https://api.weixin.qq.com/cgi-bin/tags/members/batchuntagging"
 )
 
 //获取用户列表
-func (this *Context) GetUserOpenidList(next_openid string) (responseData ResponseUserOpenidList, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s&next_openid=%s", UserOpenidListUrl, this.GetAccessToken(), next_openid)
+func (this *Context) GetUserList(next_openid string) (responseData ResponseUserList, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s&next_openid=%s", UrlUserList, this.GetAccessToken(), next_openid)
 	var body []byte
 	body, err = util.HttpGet(uri)
 	if err != nil {
@@ -116,7 +128,7 @@ func (this *Context) GetUserOpenidList(next_openid string) (responseData Respons
 
 //获取单个用户信息
 func (this *Context) GetUserInfo(openid string) (responseData ResponseUserInfo, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s&openid=%s&lang=zh_CN", UserInfoUrl, this.GetAccessToken(), openid)
+	uri := fmt.Sprintf("%s?access_token=%s&openid=%s&lang=zh_CN", UrlUserInfo, this.GetAccessToken(), openid)
 	var body []byte
 	body, err = util.HttpGet(uri)
 	if err != nil {
@@ -134,8 +146,8 @@ func (this *Context) GetUserInfo(openid string) (responseData ResponseUserInfo, 
 }
 
 //获取多个用户信息
-func (this *Context) GetUserInfoBatchget(openids []string) (responseData ResponseUserInfoBatchget, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s", UserInfoBatchgetUrl, this.GetAccessToken())
+func (this *Context) GetUserInfoBatchget(openids []string) (responseData ResponseBatchUserInfo, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlBatchUserInfo, this.GetAccessToken())
 
 	type selectUser struct {
 		Openid string `json:"openid"`
@@ -169,8 +181,8 @@ func (this *Context) GetUserInfoBatchget(openids []string) (responseData Respons
 }
 
 //获取用户标签列表
-func (this *Context) GetUserTagsList() (responseData ResponseUserTagsList, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s", UserTagsListUrl, this.GetAccessToken())
+func (this *Context) GetUserTagsList() (responseData ResponseTagsList, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlTagsList, this.GetAccessToken())
 	var body []byte
 	body, err = util.HttpGet(uri)
 	if err != nil {
@@ -188,8 +200,8 @@ func (this *Context) GetUserTagsList() (responseData ResponseUserTagsList, err e
 }
 
 //创建用户标签
-func (this *Context) CreateUserTags(name string) (responseData ResponseCreateUserTags, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s", UserTagsCreateUrl, this.GetAccessToken())
+func (this *Context) CreateUserTags(name string) (responseData ResponseTagsCreate, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlTagsCreate, this.GetAccessToken())
 	postData := map[string]interface{}{
 		"tag": struct {
 			Name string
@@ -216,7 +228,7 @@ func (this *Context) CreateUserTags(name string) (responseData ResponseCreateUse
 
 //修改用户标签
 func (this *Context) UpdateUserTags(id int, name string) (responseData ResponseCommon, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s", UserTagsUpdateUrl, this.GetAccessToken())
+	uri := fmt.Sprintf("%s?access_token=%s", UrlTagsUpdate, this.GetAccessToken())
 	postData := map[string]interface{}{
 		"tag": struct {
 			Id   int
@@ -245,7 +257,7 @@ func (this *Context) UpdateUserTags(id int, name string) (responseData ResponseC
 
 //删除用户标签
 func (this *Context) DeleteUserTags(id int) (responseData ResponseCommon, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s", UserTagsDeleteUrl, this.GetAccessToken())
+	uri := fmt.Sprintf("%s?access_token=%s", UrlTagsDelete, this.GetAccessToken())
 	postData := map[string]interface{}{
 		"tag": struct {
 			Id int
@@ -271,8 +283,8 @@ func (this *Context) DeleteUserTags(id int) (responseData ResponseCommon, err er
 }
 
 //获取标签下的粉丝openid列表
-func (this *Context) GetTagsOpenidList(id int, next_openid string) (responseData ResponseTagsOpenidList, err error) {
-	uri := fmt.Sprintf("%s?access_token=%s", TagsOpenidListUrl, this.GetAccessToken())
+func (this *Context) GetUserListFromTags(id int, next_openid string) (responseData ResponseUserListFromTags, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlUserListFromTags, this.GetAccessToken())
 	postData := map[string]interface{}{
 		"tagid":       id,
 		"next_openid": next_openid,
@@ -289,6 +301,78 @@ func (this *Context) GetTagsOpenidList(id int, next_openid string) (responseData
 	}
 	if responseData.ErrCode != 0 {
 		err = fmt.Errorf("get get_tags_openid_list error : errcode=%v , errmsg=%v", responseData.ErrCode, responseData.ErrMsg)
+		return
+	}
+	return
+}
+
+//批量为用户打标签
+func (this *Context) BatchTaggingToUser(id int, openids []string) (responseData ResponseCommon, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlBatchTaggingUser, this.GetAccessToken())
+	postData := map[string]interface{}{
+		"tagid":       id,
+		"openid_list": openids,
+	}
+
+	var body []byte
+	body, err = util.HttpPostJson(uri, postData)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(body, &responseData)
+	if err != nil {
+		return
+	}
+	if responseData.ErrCode != 0 {
+		err = fmt.Errorf("get batch_set_user_tag error : errcode=%v , errmsg=%v", responseData.ErrCode, responseData.ErrMsg)
+		return
+	}
+	return
+}
+
+//批量为用户取消标签
+func (this *Context) BatchUnTaggingToUser(id int, openids []string) (responseData ResponseCommon, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlBatchUnTaggingUser, this.GetAccessToken())
+	postData := map[string]interface{}{
+		"tagid":       id,
+		"openid_list": openids,
+	}
+
+	var body []byte
+	body, err = util.HttpPostJson(uri, postData)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(body, &responseData)
+	if err != nil {
+		return
+	}
+	if responseData.ErrCode != 0 {
+		err = fmt.Errorf("get batch_un_set_user_tag error : errcode=%v , errmsg=%v", responseData.ErrCode, responseData.ErrMsg)
+		return
+	}
+	return
+}
+
+//设置用户备注名
+func (this *Context) SetUserRemark(openid string, remark string) (responseData ResponseCommon, err error) {
+	uri := fmt.Sprintf("%s?access_token=%s", UrlSetUserRemark, this.GetAccessToken())
+	postData := map[string]interface{}{
+		"openid": openid,
+		"remark": remark,
+	}
+
+	var body []byte
+	body, err = util.HttpPostJson(uri, postData)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(body, &responseData)
+	if err != nil {
+		return
+	}
+	if responseData.ErrCode != 0 {
+		err = fmt.Errorf("get set_user_remark error : errcode=%v , errmsg=%v", responseData.ErrCode, responseData.ErrMsg)
 		return
 	}
 	return

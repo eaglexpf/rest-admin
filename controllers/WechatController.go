@@ -3,6 +3,10 @@ package controllers
 import (
 	"fmt"
 
+	"io/ioutil"
+
+	//	"io"
+
 	"github.com/eaglexpf/rest-admin/pkg"
 	"github.com/eaglexpf/rest-admin/pkg/wechat"
 	"github.com/eaglexpf/rest-admin/pkg/wechat/cache"
@@ -34,6 +38,7 @@ func (this *WechatController) RegisterRouter(router *gin.Engine) {
 	r.Any("/instance", this.instance)
 	r.GET("/access_token", this.GetQrCode)
 	r.GET("/user", this.GetUserList)
+	r.POST("/upload", this.PostFile)
 }
 
 func (this *WechatController) instance(c *gin.Context) {
@@ -46,6 +51,19 @@ func (this *WechatController) instance(c *gin.Context) {
 func (this *WechatController) WxMessage(request message.RequestMessage) interface{} {
 	fmt.Println(request)
 	return nil
+}
+
+func (this *WechatController) PostFile(c *gin.Context) {
+	wx := getWx(c)
+	file, _ := c.FormFile("upload")
+	filename := file.Filename
+	var data []byte
+	file_open, _ := file.Open()
+	data, _ = ioutil.ReadAll(file_open)
+	res, _ := wx.Context.UploadMedia("image", filename, data)
+	c.JSON(200, gin.H{
+		"data": res,
+	})
 }
 
 func (this *WechatController) GetUserList(c *gin.Context) {
